@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj": {}
+    "C:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj": {
+    "C:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj",
+        "projectUniqueName": "C:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj",
         "projectName": "GameStore.api",
-        "projectPath": "c:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj",
+        "projectPath": "C:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\GameStore.api.csproj",
         "packagesPath": "C:\\Users\\Alejandro\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\obj\\",
+        "outputPath": "C:\\Users\\Alejandro\\Documents\\Net_project\\GameStore.api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Alejandro\\AppData\\Roaming\\NuGet\\NuGet.Config"
