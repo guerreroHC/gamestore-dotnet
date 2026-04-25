@@ -1,0 +1,41 @@
+# .NET build outputs
+bin/
+obj/
+
+# Visual Studio / VS Code user files
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.assets.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# SQLite temporary files
+*.db-shm
+*.db-wal
+*.sqlite-shm
+*.sqlite-wal
+
+# Environment / secrets
+.env
+appsettings.Local.json
+appsettings.*.local.json
