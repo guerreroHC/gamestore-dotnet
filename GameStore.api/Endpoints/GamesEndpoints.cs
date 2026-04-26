@@ -2,50 +2,53 @@ using System;
 using GameStore.api.Data;
 using GameStore.api.Dtos;
 using GameStore.api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.api.Endpoints;
 
+// Contains endpoint mappings for managing games in the GameStore API
 public static class GamesEndpoints
 {
     private const string GetGameEndpointName = "GetGame";
-    private static readonly List<GameDto> games = [
-    new(
-        1,
-        "Street Fighter II",
-        "Fighting",
-        19.99M,
-        new DateOnly(1992, 7, 15)
-    ),
-    new(
-        2,
-        "Final Fantasy VII",
-        "RPG",
-        69.99M,
-        new DateOnly(2024,2,29)
-    ),
-    new(
-        3,
-        "Astro Bot",
-        "Platformer",
-        59.99M,
-        new DateOnly(2024,9,6)
-    )
-];
 
+    // Maps all the endpoints related to games to the WebApplication
     public static void MapGamesEndpoints(this WebApplication app)
     {
-        //GET /games
-        app.MapGet("/games", () => games);
+        // GET /games
+        // Retrieves a list of all games, including their genres, as a summary
+        // Why: This endpoint is useful for displaying a list of games to users, such as in a store or catalog view.
+        app.MapGet("/games", async (GameStoreContext dbContext) => await dbContext.Games.Include(game => game.Genre)
+        .Select(game => new GameSummaryDto(
+            game.Id,
+            game.Name,
+            game.Genre!.Name,
+            game.Price,
+            game.ReleaseDate
+        )).AsNoTracking().ToListAsync());
+        
 
-        //GET /games/{id}
-        app.MapGet("/games/{id}", (int id) => 
+        // GET /games/{id}
+        // Retrieves detailed information about a specific game by its ID
+        // Why: This endpoint allows users to view detailed information about a single game, such as when they click on a game in the catalog.
+        app.MapGet("/games/{id}", async (int id, GameStoreContext dbContext) => 
         {
-            var game = games.Find(games => games.Id == id);
-            return game is null ? Results.NotFound() : Results.Ok(game);
+            var game = await dbContext.Games.FindAsync(id);
+
+            return game is null ? Results.NotFound() : Results.Ok(
+                new GameDetailsDto(
+                    game.Id,
+                    game.Name,
+                    game.GenreId,
+                    game.Price,
+                    game.ReleaseDate
+                )
+            );
         }).WithName(GetGameEndpointName);
 
-        //POST /games
-        app.MapPost("/games", (CreateGameDto newGame, GameStoreContext dbContext) =>
+        // POST /games
+        // Creates a new game and adds it to the database
+        // Why: This endpoint is used to add new games to the store, such as when an admin adds a new product.
+        app.MapPost("/games", async (CreateGameDto newGame, GameStoreContext dbContext) =>
         {
             Game game = new()
             {
@@ -56,7 +59,7 @@ public static class GamesEndpoints
             };
 
             dbContext.Games.Add(game);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             GameDetailsDto gameDto = new(
                 game.Id,
@@ -72,31 +75,33 @@ public static class GamesEndpoints
             );
         });
 
-        //PUT /games/1
-        app.MapPut("/games/{id}", (int id, UpdateGameDto updatedGame) =>
+        // PUT /games/{id}
+        // Updates an existing game by its ID
+        // Why: This endpoint allows admins to modify the details of an existing game, such as updating its price or release date.
+        app.MapPut("/games/{id}", async(int id, UpdateGameDto updatedGame, GameStoreContext dbContext) =>
         {
-            var index = games.FindIndex(games => games.Id == id);
-            if (index == -1)
+            var existingGame = await dbContext.Games.FindAsync(id);
+            if (existingGame is null)
             {
                 return Results.NotFound();
             }
 
-            games[index] = new GameDto(
-             id,
-             updatedGame.Name,
-             updatedGame.Genre,
-             updatedGame.Price,
-             updatedGame.ReleaseDate
-         );
-         return Results.NoContent();
-     });
+            existingGame.Name = updatedGame.Name;
+            existingGame.GenreId = updatedGame.GenreId;
+            existingGame.Price = updatedGame.Price;
+            existingGame.ReleaseDate = updatedGame.ReleaseDate;
 
-     //DELETE /games/1
-     app.MapDelete("/games/{id}", (int id) =>
-     {
-         games.RemoveAll(games => games.Id == id); 
-         return Results.NoContent();
-     });
+            await dbContext.SaveChangesAsync();
+            return Results.NoContent();
+        });
+
+        // DELETE /games/{id}
+        // Deletes a game by its ID
+        // Why: This endpoint is used to remove games from the store, such as when a product is discontinued.
+        app.MapDelete("/games/{id}", async (int id, GameStoreContext dbContext) =>
+        {
+            await dbContext.Games.Where(game => game.Id == id).ExecuteDeleteAsync();
+            return Results.NoContent();
+        });
     }
-
 }
